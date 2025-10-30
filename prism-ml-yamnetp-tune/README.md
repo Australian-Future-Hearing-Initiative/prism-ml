@@ -41,6 +41,9 @@ python3 inference.py --model_file=yamnetp_ahead_ds.keras --sound_file=cocktail_p
 
 # Test example
 python3 test.py --model_file=yamnetp_ahead_ds.keras --filelist=ahead_ds_testing.csv --threshold="0.0,0.1,0.2,0.3,0.4,0.5,0.6,0.7,0.8,0.9,1.0"
+
+# Convert to LiteRT
+python3 convert_to_litert.py --keras_file=yamnetp_ahead_ds.keras --liteRT_file=yamnetp_ahead_ds.tflite
 ```
 
 # Data format
