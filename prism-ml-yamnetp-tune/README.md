@@ -1,15 +1,23 @@
 # Introduction
+Train and evaluate OpenYAMNet/YAMNet+ on AHEAD-DS, with inference and TFLite conversion helpers.
 
-Train OpenYAMNet/YAMNet+ using YAMNet.
+- [Paper](https://arxiv.org/abs/2508.10360)
+- [Dataset AHEAD-DS](https://huggingface.co/datasets/hzhongresearch/ahead_ds)
+- [Dataset AHEAD-DS unmixed](https://huggingface.co/datasets/hzhongresearch/ahead_ds_unmixed)
+- [Models](https://huggingface.co/hzhongresearch/yamnetp_ahead_ds)
 
-* [Website](https://github.com/Australian-Future-Hearing-Initiative)
-* [Paper](https://arxiv.org/abs/2508.10360)
-* [Code](https://github.com/Australian-Future-Hearing-Initiative/prism-ml/prism-ml-yamnetp-tune)
-* [Dataset AHEAD-DS](https://huggingface.co/datasets/hzhongresearch/ahead_ds)
-* [Dataset AHEAD-DS unmixed](https://huggingface.co/datasets/hzhongresearch/ahead_ds_unmixed)
-* [Models](https://huggingface.co/hzhongresearch/yamnetp_ahead_ds)
+## Quick Start (inference only)
+```
+python3 -m venv env_yamnet
+source env_yamnet/bin/activate
+pip install --upgrade pip
+pip install --requirement requirements.txt
 
-# Setup, tune and perform transfer learning
+# Download a released model (Keras or TFLite) from the link above
+python3 inference.py --model_file=yamnetp_ahead_ds.keras --sound_file=cocktail_party_00001.wav
+```
+
+## Train / Transfer Learn
 
 ```
 # Setup
