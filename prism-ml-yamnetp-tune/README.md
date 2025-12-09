@@ -10,7 +10,6 @@ Train OpenYAMNet/YAMNet+ using YAMNet.
 * [Models](https://huggingface.co/hzhongresearch/yamnetp_ahead_ds)
 
 # Setup, tune and perform transfer learning
-
 ```
 # Setup
 sudo apt update
