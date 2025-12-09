@@ -9,17 +9,6 @@ Train OpenYAMNet/YAMNet+ using YAMNet.
 * [Dataset AHEAD-DS unmixed](https://huggingface.co/datasets/hzhongresearch/ahead_ds_unmixed)
 * [Models](https://huggingface.co/hzhongresearch/yamnetp_ahead_ds)
 
-# Quick start (inference only)
-```
-python3 -m venv env_yamnet
-source env_yamnet/bin/activate
-pip install --upgrade pip
-pip install --requirement requirements.txt
-
-# Download a released model (Keras or TFLite) from the link above
-python3 inference.py --model_file=yamnetp_ahead_ds.keras --sound_file=cocktail_party_00001.wav
-```
-
 # Setup, tune and perform transfer learning
 
 ```
@@ -87,6 +76,3 @@ Attribution.
   year={2025}
 }
 ```
-
-# Contact
-For questions about YamNet+ training/inference: romaric.bouveret@mq.edu.au
