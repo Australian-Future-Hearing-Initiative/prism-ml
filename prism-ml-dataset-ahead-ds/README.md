@@ -1,22 +1,18 @@
 # Introduction
-Scripts to build Another HEAring aiD scenes DataSet (AHEAD-DS) and AHEAD-DS unmixed from raw sources.
+Scripts to download several datasets and merge them into Another HEAring aiD scenes DataSet (AHEAD-DS).
 
-- [Paper](https://arxiv.org/abs/2508.10360)
-- [Models](https://huggingface.co/hzhongresearch/yamnetp_ahead_ds)
-- [Dataset AHEAD-DS](https://huggingface.co/datasets/hzhongresearch/ahead_ds)
-- [Dataset AHEAD-DS unmixed](https://huggingface.co/datasets/hzhongresearch/ahead_ds_unmixed)
+* [Website](https://github.com/Australian-Future-Hearing-Initiative)
+* [Paper](https://arxiv.org/abs/2508.10360)
+* [Code](https://github.com/Australian-Future-Hearing-Initiative/prism-ml/prism-ml-yamnetp-tune)
+* [Dataset AHEAD-DS](https://huggingface.co/datasets/hzhongresearch/ahead_ds)
+* [Dataset AHEAD-DS unmixed](https://huggingface.co/datasets/hzhongresearch/ahead_ds_unmixed)
+* [Models](https://huggingface.co/hzhongresearch/yamnetp_ahead_ds)
 
-## Quick Start (download prebuilt)
+# Quick Start (download prebuilt)
 - To **use the data**, download from Hugging Face (links above). Each repo contains the ZIP and CSVs; no processing needed.
 - To **rebuild from raw audio**, follow the steps below. This is heavy (hundreds of GB downloaded and processed) and time-consuming.
 
-## Prerequisites
-- Python 3.10+ and `python3-venv`
-- `ffmpeg`, `tar`, `gzip`, `bzip2`, `wget`, `zip`
-- Sufficient disk/CPU for large audio processing
-
-## Rebuild Steps
-
+# Setup and download
 ```
 # Setup 
 sudo apt update
