@@ -42,10 +42,13 @@ Licenced under Apache 2.0. See [LICENCE.txt](LICENCE.txt).
 Attribution.
 
 ```
-@article{zhong2025dataset,
-  title={A dataset and model for recognition of audiologically relevant environments for hearing aids: AHEAD-DS and YAMNet+},
-  author={Zhong, Henry and Buchholz, J{\"o}rg M and Maclaren, Julian and Carlile, Simon and Lyon, Richard},
-  journal={arXiv preprint arXiv:2508.10360},
-  year={2025}
+@misc{zhong2026datasetmodelauditoryscene,
+      title={A dataset and model for auditory scene recognition for hearing devices: AHEAD-DS and OpenYAMNet}, 
+      author={Henry Zhong and Jörg M. Buchholz and Julian Maclaren and Simon Carlile and Richard Lyon},
+      year={2026},
+      eprint={2508.10360},
+      archivePrefix={arXiv},
+      primaryClass={cs.SD},
+      url={https://arxiv.org/abs/2508.10360}, 
 }
 ```
