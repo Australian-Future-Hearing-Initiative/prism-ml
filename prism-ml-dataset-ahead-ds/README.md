@@ -1,5 +1,4 @@
 # Introduction
-
 Scripts to download several datasets and merge them into Another HEAring aiD scenes DataSet (AHEAD-DS).
 
 * [Website](https://github.com/Australian-Future-Hearing-Initiative)
@@ -9,8 +8,11 @@ Scripts to download several datasets and merge them into Another HEAring aiD sce
 * [Dataset AHEAD-DS unmixed](https://huggingface.co/datasets/hzhongresearch/ahead_ds_unmixed)
 * [Models](https://huggingface.co/hzhongresearch/yamnetp_ahead_ds)
 
-# Setup and download
+# Quick Start (download prebuilt)
+- To **use the data**, download from Hugging Face (links above). Each repo contains the ZIP and CSVs; no processing needed.
+- To **rebuild from raw audio**, follow the steps below. This is heavy (hundreds of GB downloaded and processed) and time-consuming.
 
+# Setup and download
 ```
 # Setup 
 sudo apt update
