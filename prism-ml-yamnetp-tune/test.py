@@ -160,8 +160,8 @@ def print_pr_tf(threshold_list, class_names, pr_dict):
             precision = (tp + eps) / (tp + fp + eps)
             recall = (tp + eps) / (tp + fn + eps)
             print(
-                f"{thresh_val:.5f}, {precision:.5f}, "+
-                f"{recall:.5f}, {tp}, {tn}, {fp}, {fn}"
+                f"{thresh_val:.5f}, {precision:.5f}, "
+                + f"{recall:.5f}, {tp}, {tn}, {fp}, {fn}"
             )
             precision_list.append(precision)
         # Print and store ap value
