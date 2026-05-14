@@ -16,4 +16,4 @@ unzip TAU-urban-audio-visual-scenes-2021-development.audio.6.zip
 unzip TAU-urban-audio-visual-scenes-2021-development.audio.7.zip
 unzip TAU-urban-audio-visual-scenes-2021-development.audio.8.zip
 mv TAU-urban-audio-visual-scenes-2021-development/audio/*.wav .
-rm -r TAU-urban-acoustic-scenes-2019-development
+rm -r TAU-urban-audio-visual-scenes-2021-development
