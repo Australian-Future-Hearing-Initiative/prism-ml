@@ -10,9 +10,8 @@ import train_transfer
 
 
 # Disable GPU on TensorFlow
-# TF crashes with JIT error if CUDA CUDNN not properly set up
-# Stick with CPU just to be safe
-tf.config.set_visible_devices(devices=[], device_type="GPU")
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
 
 
 def _main_tf(model_file, sound_file):
@@ -33,7 +32,7 @@ def _main_tf(model_file, sound_file):
         std_sd=train_transfer.std_sd,
     )
     # Load model
-    model = tf.keras.models.load_model(filepath=model_file)
+    model = tf.keras.models.load_model(filepath=model_file, safe_mode=False)
     # Inference
     scores = model(waveform)
     max_score = tf.math.reduce_max(input_tensor=scores, axis=1)

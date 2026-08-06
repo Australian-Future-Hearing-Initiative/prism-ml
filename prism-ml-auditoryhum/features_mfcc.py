@@ -7,7 +7,6 @@ import glob
 import librosa
 import numpy as np
 
-
 # Signal processing parameters
 n_fft = 2048
 hop_length = 512

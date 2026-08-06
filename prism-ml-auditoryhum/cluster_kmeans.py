@@ -10,7 +10,6 @@ from sklearn.manifold import TSNE
 from sklearn.metrics import silhouette_score
 from sklearn.preprocessing import normalize
 
-
 # Shared parameters
 seed = 100
 # KMeans hyperparameters
@@ -25,6 +24,7 @@ tsne_max_iter = 500
 n_iter_without_progress = 100
 metric = "euclidean"
 tsne_init = "random"
+sil_metric = "euclidean"
 
 
 def kmeans_clusters(data, n_clusters, init, max_iter, seed):
@@ -109,20 +109,23 @@ def plot_clusters(data, labels, title, png_plot):
     plt.figure(figsize=(12, 12))
     plt.scatter(x=data[:, 0], y=data[:, 1], c=labels)
     plt.title(label=title, fontsize=35, fontweight="bold", wrap=True)
-    plt.xlabel(xlabel="X-axis", fontsize=35, fontweight="bold")
-    plt.ylabel(ylabel="Y-axis", fontsize=35, fontweight="bold")
-    plt.tick_params(axis="both", labelsize=25)
+    # plt.xlabel(xlabel="X-axis", fontsize=35, fontweight="bold")
+    # plt.ylabel(ylabel="Y-axis", fontsize=35, fontweight="bold")
+    plt.xticks([])
+    plt.yticks([])
+    # plt.tick_params(axis="both", labelsize=25)
     plt.savefig(fname=png_plot, format="png")
 
 
-def sil_metrics(data, labels):
+def sil_metrics(data, labels, metric):
     """Show Silhouette Score metrics.
 
     Args:
         data: Input data.
         labels: Input labels.
+        metric: Distance metric.
     """
-    sil_score = silhouette_score(X=data, labels=labels)
+    sil_score = silhouette_score(X=data, labels=labels, metric=metric)
     print("Silhouette Score", sil_score)
 
 
@@ -164,7 +167,7 @@ def _main(cluster_npy, n_clusters, label_csv, png_plot):
         title=f"t-SNE Visualisation K-Means k={n_clusters}",
         png_plot=png_plot,
     )
-    sil_metrics(data=spec_data, labels=labels)
+    sil_metrics(data=spec_data, labels=labels, metric=sil_metric)
 
 
 def _command_line():

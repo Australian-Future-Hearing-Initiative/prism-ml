@@ -11,7 +11,6 @@ import sys
 
 import label_qwen2a
 
-
 # Google Cloud Gen AI parameters
 conversation_text = "Describe the auditory scene using word pairs. Separate \
 each pair with a comma."

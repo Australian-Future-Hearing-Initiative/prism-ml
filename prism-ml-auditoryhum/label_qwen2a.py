@@ -16,7 +16,6 @@ from transformers import (
     Qwen2AudioForConditionalGeneration,
 )
 
-
 # QWEN2-Audio hyperparameters
 # device_map = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device_map = "auto"

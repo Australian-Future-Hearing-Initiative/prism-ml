@@ -9,15 +9,16 @@ import torch
 from sklearn.metrics.pairwise import cosine_similarity
 from transformers import ClapModel, ClapProcessor
 
-
 # CLAP hyperparameters
-device_map = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+# device_map = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+device_map = "auto"
 
 
-def _text_to_set(text_label_csv):
+def _text_to_set(label_limit, text_label_csv):
     """Get list of lists text labels.
 
     Args:
+        label_limit: Max number of words for label.
         text_label_csv: The text labels are in this CSV.
 
     Returns:
@@ -34,15 +35,18 @@ def _text_to_set(text_label_csv):
             ]
             # Strip blanks from ends
             cleaned_line = [x.strip() for x in cleaned_line]
-            # Force the text to be at most word pairs
-            cleaned_line = [" ".join(x.split()[:2]) for x in cleaned_line]
+            # Limit the word length of labels
+            if label_limit:
+                cleaned_line = [
+                    " ".join(x.split()[:label_limit]) for x in cleaned_line
+                ]
             lines.append(cleaned_line)
             index += 1
             print(f"Labels {index}")
     return lines
 
 
-def _text_label_embeddings(model, processor, text_label):
+def text_label_embeddings(model, processor, text_label):
     """Calculate text label embeddings.
 
     Args:
@@ -94,13 +98,21 @@ def _compare_wav_text(audio_embeddings, text_embeddings):
     return top_score_list, top_index_list, top_text_embeddings_list
 
 
-def _main(filedir, clap_model, clap_npy, text_label_csv, top_label_scores_csv):
+def _main(
+    filedir,
+    clap_model,
+    clap_npy,
+    label_limit,
+    text_label_csv,
+    top_label_scores_csv,
+):
     """Get text label CLAP embeddings.
 
     Args:
         filedir: Regex file path of audio. E.g. "*.wav".
         clap_model: CLAP model filepath.
         clap_npy: Path for existing CLAP embeddings.
+        label_limit: Max number of words for label.
         text_label_csv: The text labels from MLLM.
         top_label_scores_csv: Path for saving scores.
         chosen_labels_csv: Path for saving chosen labels and scores.
@@ -117,8 +129,10 @@ def _main(filedir, clap_model, clap_npy, text_label_csv, top_label_scores_csv):
     model.eval()
     torch.inference_mode(mode=True)
     audio_embeddings = np.load(file=clap_npy, allow_pickle=True)
-    text_label = _text_to_set(text_label_csv=text_label_csv)
-    text_embeddings = _text_label_embeddings(
+    text_label = _text_to_set(
+        label_limit=label_limit, text_label_csv=text_label_csv
+    )
+    text_embeddings = text_label_embeddings(
         model=model,
         processor=processor,
         text_label=text_label,
@@ -171,6 +185,14 @@ def _command_line():
         required=True,
         dest="clap_npy",
         help="Path for existing CLAP embeddings.",
+    )
+    parser.add_argument(
+        "--label_limit",
+        metavar="N",
+        type=int,
+        required=False,
+        dest="label_limit",
+        help="Max number of words for label.",
     )
     parser.add_argument(
         "--text_label_csv",

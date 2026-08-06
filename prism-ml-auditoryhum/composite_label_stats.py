@@ -46,12 +46,14 @@ def _cluster_distro_vector(top_label, cluster_indices):
     print("")
 
 
-def _main(label_csv, top_label_scores_csv):
-    """Get stats for composite labels.
+def get_top_labels(top_label_scores_csv):
+    """Get top scoring labels.
 
     Args:
-        label_csv: Path CSV labels.
         top_label_scores_csv: Path for saving scores.
+
+    Return:
+        A list of top scoring labels.
     """
     with open(
         file=top_label_scores_csv, mode="r", encoding="utf-8"
@@ -61,6 +63,17 @@ def _main(label_csv, top_label_scores_csv):
         top_label = [x for x in top_label if x.strip()]
         top_label = [x.split(",") for x in top_label]
         top_label = [x[2].strip() for x in top_label]
+    return top_label
+
+
+def _main(label_csv, top_label_scores_csv):
+    """Get stats for composite labels.
+
+    Args:
+        label_csv: Path CSV labels.
+        top_label_scores_csv: Path CSV for top scoring labels.
+    """
+    top_label = get_top_labels(top_label_scores_csv=top_label_scores_csv)
     with open(file=label_csv, mode="r", encoding="utf-8") as label_file:
         cluster_indices = label_file.read()
         cluster_indices = cluster_indices.split("\n")
@@ -68,12 +81,8 @@ def _main(label_csv, top_label_scores_csv):
         cluster_indices = [int(x) for x in cluster_indices]
     top_label = np.array(object=top_label)
     cluster_indices = np.array(object=cluster_indices)
-    _label_distro_vector(
-        top_label=top_label, cluster_indices=cluster_indices
-    )
-    _cluster_distro_vector(
-        top_label=top_label, cluster_indices=cluster_indices
-    )
+    _label_distro_vector(top_label=top_label, cluster_indices=cluster_indices)
+    _cluster_distro_vector(top_label=top_label, cluster_indices=cluster_indices)
 
 
 def _command_line():
@@ -99,7 +108,7 @@ def _command_line():
         type=str,
         required=True,
         dest="top_label_scores_csv",
-        help="Path for saving chosen labels and scores.",
+        help="Path CSV for top scoring labels",
     )
     collected_arguments = vars(parser.parse_args())
     return collected_arguments

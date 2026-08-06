@@ -12,9 +12,8 @@ import model
 
 
 # Disable GPU on TensorFlow
-# TF crashes with JIT error if CUDA CUDNN not properly set up
-# Stick with CPU just to be safe
-tf.config.set_visible_devices(devices=[], device_type="GPU")
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
 # Set a fixed global random seed for TF
 # tf.random.set_seed(seed=1234)
 tf.random.set_seed(seed=None)
@@ -70,6 +69,7 @@ augmentations = [
     augment.augment_uniform_noise,
     augment.augment_stretch,
 ]
+augmentations = None
 # Do not shuffle or augment validation data
 val_shuffle = False
 val_augment = None

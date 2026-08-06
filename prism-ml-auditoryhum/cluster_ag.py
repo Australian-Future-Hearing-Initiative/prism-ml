@@ -10,10 +10,10 @@ from sklearn.preprocessing import normalize
 
 import cluster_kmeans as ck
 
-
 # Agglomerative Clustering hyperparameters
 metric = "euclidean"
 linkage = "ward"
+sil_metric = "euclidean"
 
 
 def ag_clusters(data, n_clusters, metric, linkage):
@@ -47,6 +47,7 @@ def _main(cluster_npy, n_clusters, label_csv, png_plot):
         png_plot: PNG to save visualisation.
     """
     raw_data = np.load(file=cluster_npy, allow_pickle=True)
+    # np.savetxt('output.csv', raw_data, delimiter=',', fmt='%.5f')
     spec_data = raw_data
     # spec_data = normalize(X=spec_data, norm="l2", axis=1)
     labels = ag_clusters(
@@ -76,7 +77,7 @@ def _main(cluster_npy, n_clusters, label_csv, png_plot):
         title=title,
         png_plot=png_plot,
     )
-    ck.sil_metrics(data=spec_data, labels=labels)
+    ck.sil_metrics(data=spec_data, labels=labels, metric=sil_metric)
 
 
 def _command_line():
