@@ -2,6 +2,13 @@
 Test a dataset by producing metrics.
 """
 
+# NOTE
+# Disable GPU on TensorFlow
+# TensorFlow may fail to execute if it finds an
+# unsupported version of CUDA, cuDNN or drivers
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
 import argparse
 import itertools
 import tensorflow as tf
@@ -10,9 +17,6 @@ import datareader_tune
 import train_transfer
 
 
-# Disable GPU on TensorFlow
-import os
-os.environ["CUDA_VISIBLE_DEVICES"] = ""
 # Do not augment or shuffle for test
 shuffle = False
 augmentations = None
@@ -209,7 +213,10 @@ def _main_tf(model_file, filelist, threshold):
     )
     # Create confusion matrix
     conf_matrix = create_conf_matrix(class_num=len(class_names))
+    # NOTE
     # Load model
+    # OpenYAMNet/YAMNet+ uses a TFSMLayer to load pretrained YAMNet weights
+    # TFSMLayer can only be loaded when safe_mode=False
     model = tf.keras.models.load_model(filepath=model_file, safe_mode=False)
     for index, (waveform, label) in enumerate(test_data):
         predicted_raw = model(waveform)
