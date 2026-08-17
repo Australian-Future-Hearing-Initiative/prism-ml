@@ -2,6 +2,13 @@
 Test a dataset by producing metrics.
 """
 
+# NOTE
+# Disable GPU on TensorFlow
+# TensorFlow may fail to execute if it finds an
+# unsupported version of CUDA, cuDNN or drivers
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
 import argparse
 import itertools
 import tensorflow as tf
@@ -9,11 +16,6 @@ import tensorflow as tf
 import datareader_tune
 import train_transfer
 
-
-# Disable GPU on TensorFlow
-# TF crashes with JIT error if CUDA CUDNN not properly set up
-# Stick with CPU just to be safe
-tf.config.set_visible_devices(devices=[], device_type="GPU")
 
 # Do not augment or shuffle for test
 shuffle = False
@@ -90,29 +92,26 @@ def add_pr_dict_tf(truth, predicted, threshold, pr_dict):
     """Add TP, TN, FP, FN to precision/recall dictionary.
 
     Args:
-        truth: Ground truth.
-        predicted: Predicted value.
+        truth: Ground truth tensor.
+        predicted: Predicted value tensor.
         threshold: The threshold for detection.
         pr_dict: Precision/recall dictionary.
     """
-    # Find TP, FP, FN, TN
-    # Do this by multiplying pred by 2 and summing with truth
     # 3=TP, 2=FP, 1=FN, 0=TN
-    predicted2 = predicted * 2.0
-    compared = predicted2 + truth
+    compared = (predicted * 2.0) + truth
+    tp_counts = tf.reduce_sum(tf.cast(compared == 3, dtype=tf.int32), axis=0)
+    fp_counts = tf.reduce_sum(tf.cast(compared == 2, dtype=tf.int32), axis=0)
+    fn_counts = tf.reduce_sum(tf.cast(compared == 1, dtype=tf.int32), axis=0)
+    tn_counts = tf.reduce_sum(tf.cast(compared == 0, dtype=tf.int32), axis=0)
+    tp_array = tp_counts.numpy()
+    fp_array = fp_counts.numpy()
+    fn_array = fn_counts.numpy()
+    tn_array = tn_counts.numpy()
     for index in range(truth.shape[1]):
-        tp_tensor = tf.cast(x=compared[:, index] == 3, dtype="int32")
-        fp_tensor = tf.cast(x=compared[:, index] == 2, dtype="int32")
-        fn_tensor = tf.cast(x=compared[:, index] == 1, dtype="int32")
-        tn_tensor = tf.cast(x=compared[:, index] == 0, dtype="int32")
-        tp = tf.math.reduce_sum(input_tensor=tp_tensor)
-        fp = tf.math.reduce_sum(input_tensor=fp_tensor)
-        fn = tf.math.reduce_sum(input_tensor=fn_tensor)
-        tn = tf.math.reduce_sum(input_tensor=tn_tensor)
-        pr_dict[(threshold, index)]["tp"] += int(tp)
-        pr_dict[(threshold, index)]["fp"] += int(fp)
-        pr_dict[(threshold, index)]["fn"] += int(fn)
-        pr_dict[(threshold, index)]["tn"] += int(tn)
+        pr_dict[(threshold, index)]["tp"] += int(tp_array[index])
+        pr_dict[(threshold, index)]["fp"] += int(fp_array[index])
+        pr_dict[(threshold, index)]["fn"] += int(fn_array[index])
+        pr_dict[(threshold, index)]["tn"] += int(tn_array[index])
 
 
 def create_pr_dict(threshold_list, class_num):
@@ -214,10 +213,17 @@ def _main_tf(model_file, filelist, threshold):
     )
     # Create confusion matrix
     conf_matrix = create_conf_matrix(class_num=len(class_names))
+    # NOTE
     # Load model
-    model = tf.keras.models.load_model(filepath=model_file)
+    # OpenYAMNet/YAMNet+ uses a TFSMLayer to load pretrained YAMNet weights
+    # TFSMLayer can only be loaded when safe_mode=False
+    model = tf.keras.models.load_model(filepath=model_file, safe_mode=False)
     for index, (waveform, label) in enumerate(test_data):
         predicted_raw = model(waveform)
+        # Aggregate labels
+        #col_sums = tf.reduce_sum(input_tensor=predicted_raw, axis=0, keepdims=True)
+        #predicted_raw = tf.broadcast_to(input=col_sums, shape=predicted_raw.shape)
+        #predicted_raw = tf.nn.softmax(logits=predicted_raw, axis=1)
         # Iterate through all thresholds
         for thresh_val in threshold_list:
             # Process predicted and truth labels

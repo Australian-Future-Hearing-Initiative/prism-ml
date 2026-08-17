@@ -2,6 +2,13 @@
 Train a model using transfer learning.
 """
 
+# NOTE
+# Disable GPU on TensorFlow
+# TensorFlow may fail to execute if it finds an
+# unsupported version of CUDA, cuDNN or drivers
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
 import argparse
 import tensorflow as tf
 import random
@@ -11,10 +18,6 @@ import datareader_tune
 import model
 
 
-# Disable GPU on TensorFlow
-# TF crashes with JIT error if CUDA CUDNN not properly set up
-# Stick with CPU just to be safe
-tf.config.set_visible_devices(devices=[], device_type="GPU")
 # Set a fixed global random seed for TF
 # tf.random.set_seed(seed=1234)
 tf.random.set_seed(seed=None)

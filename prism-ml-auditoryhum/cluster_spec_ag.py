@@ -1,62 +1,49 @@
 """
-Cluster data with HDBSCAN.
+Cluster data with Spectral Embedding Agglomerative Clustering.
 """
 
 import argparse
 import numpy as np
-from sklearn.cluster import HDBSCAN
-from sklearn.preprocessing import normalize
+from sklearn.cluster import AgglomerativeClustering
 
 
 import cluster_kmeans as ck
+import cluster_ag as ca
+import cluster_spectral as cs
 
-# HDBSCAN hyperparameters
-min_samples = 2
-epsilon = 0.0001
+
+# Agglomerative Clustering hyperparameters
+metric = "euclidean"
+linkage = "ward"
+# Spectral Embedding hyperparameters
+affinity = "nearest_neighbors"
+n_neighbors = 30
+n_components = 2
 sil_metric = "euclidean"
 
 
-def hdbscan_clusters(data, min_cluster_size, min_samples, epsilon):
-    """Apply HDBSCAN to data.
-
-    Args:
-        data: Input data.
-        min_cluster_size: The minimum size of a group to be
-        considered a cluster.
-        min_samples: Number of samples in a neighborhood for a
-        point to be considered a core point.
-        epsilon: Hyperparam.
-
-    Return:
-        Labels (Noise is labeled -1).
-    """
-    cluster_instance = HDBSCAN(
-        min_cluster_size=min_cluster_size,
-        min_samples=min_samples,
-        cluster_selection_epsilon=epsilon,
-    )
-    labels = cluster_instance.fit_predict(X=data)
-    return labels
-
-
-def _main(cluster_npy, min_cluster_size, label_csv, png_plot):
-    """Cluster data with HDBSCAN.
+def _main(cluster_npy, n_clusters, label_csv, png_plot):
+    """Cluster data with Spectral Embedding
+    Agglomerative Clustering.
 
     Args:
         cluster_npy: Path for saved data.
-        min_cluster_size: The minimum size of a group to be
-        considered a cluster.
+        n_clusters: Number of clusters.
         label_csv: Cluster labels saved to CSV.
         png_plot: PNG to save visualisation.
     """
     raw_data = np.load(file=cluster_npy, allow_pickle=True)
-    spec_data = raw_data
-    # spec_data = normalize(X=spec_data, norm="l2", axis=1)
-    labels = hdbscan_clusters(
+    spec_data = cs.spectral_embedding(
+        data=raw_data,
+        n_components=n_components,
+        affinity=affinity,
+        n_neighbors=n_neighbors,
+        seed=ck.seed)
+    labels = ca.ag_clusters(
         data=spec_data,
-        min_cluster_size=min_cluster_size,
-        min_samples=min_samples,
-        epsilon=epsilon,
+        n_clusters=n_clusters,
+        metric=metric,
+        linkage=linkage,
     )
     np.savetxt(fname=label_csv, X=labels, delimiter=",", fmt="%d")
     data_reduced = ck.tsne_reduce(
@@ -71,8 +58,8 @@ def _main(cluster_npy, min_cluster_size, label_csv, png_plot):
         init=ck.tsne_init,
         random_state=ck.seed,
     )
-    title = f"t-SNE Visualisation for HDBSCAN "
-    title += f"(Found {len(set(labels))} clusters)"
+    title = f"t-SNE Spectral Embedding "
+    title += f"k={n_clusters}"
     ck.plot_clusters(
         data=data_reduced,
         labels=labels,
@@ -84,7 +71,10 @@ def _main(cluster_npy, min_cluster_size, label_csv, png_plot):
 
 def _command_line():
     """Process command line arguments."""
-    parser = argparse.ArgumentParser(description="Cluster data with HDBSCAN.")
+    parser = argparse.ArgumentParser(
+        description="Cluster data with Spectral Embedding \
+Agglomerative Clustering."
+    )
     parser.add_argument(
         "--cluster_npy",
         metavar="S",
@@ -94,11 +84,11 @@ def _command_line():
         help="Path for saved data.",
     )
     parser.add_argument(
-        "--min_cluster_size",
+        "--n_clusters",
         metavar="N",
         type=int,
         required=True,
-        dest="min_cluster_size",
+        dest="n_clusters",
         help="Number of clusters.",
     )
     parser.add_argument(

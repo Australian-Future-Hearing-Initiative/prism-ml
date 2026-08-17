@@ -9,7 +9,6 @@ import numpy as np
 import torch
 from transformers import ASTForAudioClassification, ASTFeatureExtractor
 
-
 # AST hyperparameters
 # device_map = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device_map = "auto"

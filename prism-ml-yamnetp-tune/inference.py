@@ -2,17 +2,18 @@
 Perform sound recognition.
 """
 
+# NOTE
+# Disable GPU on TensorFlow
+# TensorFlow may fail to execute if it finds an
+# unsupported version of CUDA, cuDNN or drivers
+import os
+os.environ["CUDA_VISIBLE_DEVICES"] = ""
+
 import argparse
 import tensorflow as tf
 
 import datareader_tune
 import train_transfer
-
-
-# Disable GPU on TensorFlow
-# TF crashes with JIT error if CUDA CUDNN not properly set up
-# Stick with CPU just to be safe
-tf.config.set_visible_devices(devices=[], device_type="GPU")
 
 
 def _main_tf(model_file, sound_file):
@@ -32,8 +33,11 @@ def _main_tf(model_file, sound_file):
         std_mean=train_transfer.std_mean,
         std_sd=train_transfer.std_sd,
     )
+    # NOTE
     # Load model
-    model = tf.keras.models.load_model(filepath=model_file)
+    # OpenYAMNet/YAMNet+ uses a TFSMLayer to load pretrained YAMNet weights
+    # TFSMLayer can only be loaded when safe_mode=False
+    model = tf.keras.models.load_model(filepath=model_file, safe_mode=False)
     # Inference
     scores = model(waveform)
     max_score = tf.math.reduce_max(input_tensor=scores, axis=1)

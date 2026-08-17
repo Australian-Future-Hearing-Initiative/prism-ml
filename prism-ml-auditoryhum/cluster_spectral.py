@@ -10,11 +10,11 @@ from sklearn.preprocessing import normalize
 
 import cluster_kmeans as ck
 
-
 # Spectral Clustering hyperparameters
 affinity = "nearest_neighbors"
 n_neighbors = 30
 n_components = 2
+sil_metric = "euclidean"
 
 
 def spectral_embedding(data, n_components, affinity, n_neighbors, seed):
@@ -85,7 +85,7 @@ def _main(cluster_npy, n_clusters, label_csv, png_plot):
         title=f"t-SNE Visualisation Spectral Clustering k={n_clusters}",
         png_plot=png_plot,
     )
-    ck.sil_metrics(data=spec_data, labels=labels)
+    ck.sil_metrics(data=spec_data, labels=labels, metric=sil_metric)
 
 
 def _command_line():

@@ -71,12 +71,15 @@ python3 features_gemma3n.py --filedir="*.wav" --gemma3n_model="gemma-3n-E2B-it-u
 python3 features_clap.py --filedir="*.wav" --clap_model="human-clap-wsce-mse-mae" --clap_npy=clap.npy
 
 # Get top scoring labels
-python3 features_clap_text.py --filedir="*.wav" --clap_model="human-clap-wsce-mse-mae" --clap_npy=clap.npy --text_label_csv=qwen2a_text_labels.csv --top_label_scores_csv=top_label_scores.csv
+python3 features_clap_text.py --filedir="*.wav" --label_limit=2 --clap_model="human-clap-wsce-mse-mae" --clap_npy=clap.npy --text_label_csv=qwen2a_text_labels.csv --top_label_scores_csv=top_label_scores.csv
 # Convert top scoring labels to text embeddings
 python3 features_st.py --st_model="all-mpnet-base-v2" --label_csv=top_label_scores.csv --st_npy=st.npy
+# Get class vector
+python3 features_cvector.py --filedir="*.wav" --clap_model="human-clap-wsce-mse-mae" --label_csv=top_label_scores.csv --cvector_npy=cvector.npy
 
 # Cluster features
 python3 cluster_ag.py --cluster_npy=st.npy --n_clusters=5 --label_csv=st_ag.csv --png_plot=st_ag.png
+python3 cluster_spec_ag.py --cluster_npy=st.npy --n_clusters=5 --label_csv=st_spec_ag.csv --png_plot=st_spec_ag.png
 python3 cluster_kmeans.py --cluster_npy=st.npy --n_clusters=3 --label_csv=st_kmeans.csv --png_plot=st_kmeans.png
 python3 cluster_spectral.py --cluster_npy=st.npy --n_clusters=3 --label_csv=st_spectral.csv --png_plot=st_spectral.png
 python3 cluster_hdbscan.py --cluster_npy=st.npy --min_cluster_size=5 --label_csv=st_hdbscan.csv --png_plot=st_hdbscan.png
@@ -88,14 +91,40 @@ python3 composite_label_stats.py --label_csv=st_ag.csv --top_label_scores_csv=to
 python3 util_merge_csv.py --csv1=qwen2a_text_labels.csv --csv2=human_annotations.csv --csv3=top_label_scores_with_annotations.csv
 python3 util_score_boost.py --csv1=top_label_scores.csv --csv2=top_label_scores_with_annotations.csv --csv3=human_annotations.csv
 
-# To produce the results from the paper
-# Recommended to run the following script manually one-line-at-a-time
-# Replace human-clap-wsce-mse-mae to test alternative CLAP implementations
-# Replace all-mpnet-base-v2 to test alternative Sentence-Transformers
-./auditoryhum_tests.sh
+# To produce captions get llama.cpp
+# Get llamap.cpp from https://github.com/ggml-org/llama.cpp
+git clone https://github.com/ggml-org/llama.cpp
+cd llama.cpp
+cmake -B build
+cmake --build build --config Release
+cd ..
+cp llama.cpp/build/bin/llama-completion .
+cp llama.cpp/build/bin/llama-mtmd-cli .
+rm -rf llama.cpp
+# Get Qwen2.5-Omni-3B-IQ4_XS.gguf
+wget https://huggingface.co/unsloth/Qwen2.5-Omni-3B-GGUF/resolve/main/Qwen2.5-Omni-3B-IQ4_XS.gguf
+# Get mmproj-F16.gguf
+wget https://huggingface.co/unsloth/Qwen2.5-Omni-3B-GGUF/resolve/main/mmproj-F16.gguf
 
-# Initiate a MLLM prompt to enter values for composite labels
-transformers chat --model_name_or_path="Qwen2.5-Omni-3B"
+# Produce results from the paper using the following scripts
+# Recommended to open and run the scripts one line at a time
+./auditoryhum_test_1_label_alignment.sh
+./auditoryhum_test_2_provided_labels_captions.sh
+./auditoryhum_test_3_class_vector.sh
+./auditoryhum_test_4_cluster.sh
+
+# Use llama.cpp for composite labels
+# Example to use llama.cpp to generate composite label
+./llama-completion --model "Qwen2.5-Omni-3B-IQ4_XS.gguf" --no-conversation --no-display-prompt --n-predict 64 --prompt "<|im_start|>system\nYou are a helpful assistant.<|im_end|>\n<|im_start|>user\nProvide a short sentence to describe this set of audio samples. The frequency distribution of individual labels for this set of audio samples is provided: human conversation, 2; pedestrians chatting, 1; adult talking, 1; people talk, 2; adults conversing, 1; people talking, 1245; people conversing, 1; total samples: 1253<|im_end|>\n<|im_start|>assistant\n"
+
+# Use llama.cpp to label audio
+./llama-mtmd-cli --model "Qwen2.5-Omni-3B-IQ4_XS.gguf" --mmproj "mmproj-F16.gguf" --n-predict 64 --no-mmproj-offload --prompt "<|im_start|>user\nDescribe the auditory scene using word pairs. Separate each pair with a comma.<|im_end|>\n<|im_start|>assistant\n" --audio "tram-vienna-285-8628-a.wav"
+
+# Use llama.cpp to caption audio
+./llama-mtmd-cli --model "Qwen2.5-Omni-3B-IQ4_XS.gguf" --mmproj "mmproj-F16.gguf" --n-predict 64 --no-mmproj-offload --prompt "<|im_start|>user\nDescribe the auditory scene.<|im_end|>\n<|im_start|>assistant\n" --audio "tram-vienna-285-8628-a.wav"
+
+# Alternatively use slower Python code for composite labels
+python3 composite_label_qwen2_5o.py --qwen2_5o_model="Qwen2.5-Omni-3B" --prompt="Provide a short sentence to describe this set of audio samples. The frequency distribution of individual labels for this set of audio samples is provided: human conversation, 2; pedestrians chatting, 1; adult talking, 1; people talk, 2; adults conversing, 1; people talking, 1245; people conversing, 1; total samples: 1253"
 ```
 
 # Licence

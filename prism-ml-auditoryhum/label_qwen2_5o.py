@@ -18,7 +18,6 @@ from transformers import (
 
 import label_qwen2a
 
-
 # QWEN2.5-Omni hyperparameters
 # device_map = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 device_map = "auto"
