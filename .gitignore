@@ -188,3 +188,16 @@ yamnet_random/
 ahead_ds/
 ahead_ds_unmixed/
 yamnet-tensorflow2-yamnet-v1/
+all-MiniLM-L6-v2/
+all-mpnet-base-v2/
+ast-finetuned-audioset-10-10-0.4593/
+clap-htsat-fused/
+gemma-3n-E2B-it-unsloth-bnb-4bit/
+human-clap-wsce-mse-mae/
+Qwen2.5-Omni-3B/
+Qwen2-Audio-7B-Instruct/
+Qwen3-Omni-30B-A3B-Instruct/
+llama-mtmd-cli
+llama-cli
+llama-completion
+*.gguf
